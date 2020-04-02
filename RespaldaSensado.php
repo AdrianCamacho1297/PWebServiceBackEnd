@@ -1,15 +1,15 @@
 <?php 
-    include_once("../Utilerias/BaseDatos.php");
-    header('Content-type: application/json; charset=utf-8');
-    $method=$_SERVER['REQUEST_METHOD'];
-
-    $obj = json_decode( file_get_contents('php://input') );   
+    include_once("./Utilerias/BaseDatos.php");
+header('Content-type: application/json; charset=utf-8');
+$method=$_SERVER['REQUEST_METHOD'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $obj = json_decode( file_get_contents('php://input'));   
     $objArr = (array)$obj;
-    if (empty($objArr))
+	if (empty($objArr))
     {
-        $response["success"] = 422;  //No encontro información 
+		$response["success"] = 422;  //No encontro información 
         $response["message"] = "Error: checar json entrada";
-        header($_SERVER['SERVER_PROTOCOL']." 422  Error: faltan parametros de entrada json ");      
+        header($_SERVER['SERVER_PROTOCOL']." 422  Error: faltan parametros de entrada json ");		
     }
     else
     {
@@ -26,7 +26,7 @@
         foreach ($res as $value){
             $result = InsActSen($value);
         }
-                    
+					
         if ($result == 1) {
             $response["success"] = "201";
             $response["message"] = "Se Respaldo Sensado";
@@ -37,5 +37,10 @@
             header($_SERVER['SERVER_PROTOCOL'] . " 409  Conflicto al Insertar ");
         }
     }
-    echo json_encode($response);
+} else {
+    // required field is missing
+    $response["success"] = 400;
+    $response["message"] = "La solicitud no fue válida";
+}
+echo json_encode($response);
 ?>
